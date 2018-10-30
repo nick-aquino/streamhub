@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!--meta http-equiv="X-UA-Compatible" content="IE=edge"-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreamHub</title>
+  <link rel="stylesheet" type="text/css" href="styles/inline.css">
+  
+</head>
+<body>
+
+  <div class="header">
+    <h1 class="header_title">Stream Hub</h1>
+    <div class="serviceButtonContainer">
+      <img id="nfx" class="serviceButton selected" aria-label="Netflix" src="./images/services/netflix"></img>
+      <img id="amp" class="serviceButton selected" aria-label="Amazon Prime" src="./images/services/amazon-prime-video"></img>
+      <img id="hbg" class="serviceButton selected" aria-label="HBO GO" src="./images/services/hbo-go"></img>
+      <img id="sho" class="serviceButton selected" aria-label="Showtime" src="./images/services/showtime"></img>
+    </div>
+    <button id="addList" class="headerButton" aria-label="Add List"></button>
+    <button id="playRandom" class="headerButton" aria-label="Random"></button>
+  </div>
+  <main class="main">
+      <div class="card cardTemplate" hidden>
+        <button id="roulette" class="roulette_button hidden" aria-label="Select"></button>
+        <div class="id" hidden></div>
+        <div class="card-last-updated" hidden></div>
+        <div class="original_title" hidden></div>
+        <img class="poster" src=""></img>
+      </div>
+      <div class="loader scrollLoad" hidden>
+        <svg viewBox="0 0 32 32" width="32" height="32">
+          <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+        </svg>
+      </div>
+  </main>
+
+  <div class="loaderContainer overlay">
+	  <div class="loader">
+    <svg viewBox="0 0 32 32" width="32" height="32">
+      <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+    </svg>
+	  </div>
+  </div>
+  <script src="scripts/app.js" async></script>
+
+</body>
+</html>
