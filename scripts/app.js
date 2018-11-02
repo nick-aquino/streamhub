@@ -12,6 +12,24 @@
     cardTemplate: document.querySelector('.cardTemplate'),
     container: document.querySelector('.main')
   };
+  app.getMobileOperatingSystem = function(){
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Windows Phone must come first because its UA also contains "Android"
+    if (/windows phone/i.test(userAgent)) {
+      return "Windows Phone";
+    }
+ 
+    if (/android/i.test(userAgent)) {
+      return "Android";
+    }
+  
+    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+      return "iOS";
+    }
+    return "unknown";
+  }
 
   app.getMovies = function() {
     //console.log(page_number);
@@ -94,51 +112,58 @@
 
   app.updateStreamLink = function(data) {
     //console.log(data.title);
+    var presentation_type = ["hd","sd"];
+  presentation_type.forEach(function(quality){
     for (var i = 0; i < data.offers.length; i++) {
       var offer = data.offers[i];
 
-      if (offer.monetization_type == 'flatrate' && offer.presentation_type == 'hd') {
-        var watch_url_init = offer.urls.standard_web;
-        //console.log(watch_url_init + ' ' +offer.provider_id);
-        //should be using provider id
-        if (offer.provider_id == '8') {
-          var watch_url = watch_url_init.replace("title","watch");
-          //console.log(watch_url);
-          var card = app.visibleCards.get(data.id);
-          //card.addEventListener('click', function() {
-            window.open(watch_url,"_self")
-          //});
-          break;
-        }
-        else if (offer.provider_id == '31') {
-          var watch_url = watch_url_init + '?autoplay=true';
-          //console.log(watch_url);
-          var card = app.visibleCards.get(data.id);
-          //card.addEventListener('click', function() {
-            window.open(watch_url,"_self")
-          //});
-          break;
-        }
-        else if (offer.provider_id == '9') {
-          var watch_url = watch_url_init.substring(0, watch_url_init.indexOf('?')) + '/ref=atv_dp_pb_core?autoplay=1&t=3';
-          //console.log(watch_url);
-          var card = app.visibleCards.get(data.id);
-          //card.addEventListener('click', function() {
-            window.open(watch_url,"_self")
-          //});
-          break;
-        }
-        else if (offer.provider_id == '37') {
-          var watch_url = watch_url_init.replace("showtime","showtimeanytime").replace('#\/movie','#play');
-          //console.log(watch_url);
-          var card = app.visibleCards.get(data.id);
-          //card.addEventListener('click', function() {
-            window.open(watch_url,"_self")
-          //});
-          break;
-        }
-      }
+            if (offer.monetization_type == 'flatrate' && offer.presentation_type == quality) {
+	      var current_os = "unknown";//app.getMobileOperatingSystem();
+	      var supported = false;
+	      var watch_url_mobile = false;
+              if (current_os == 'Android' && offer.urls.deeplink_android) {
+                watch_url_mobile = offer.urls.deeplink_android;
+	      }
+	      else if (current_os == 'iOS' && offer.urls.deeplink_ios) {
+                watch_url_mobile = offer.urls.deeplink_ios;
+	      }
+	      else {
+                var watch_url_init = offer.urls.standard_web;
+	      }
+              //should be using provider id
+              if (offer.provider_id == '8') {
+		supported = true;
+		if (watch_url_init){
+                var watch_url = watch_url_init.replace("title","watch");
+		}
+              }
+              else if (offer.provider_id == '31') {
+		supported = true;
+		if (watch_url_init){
+                var watch_url = watch_url_init + '?autoplay=true';
+		}
+              }
+              else if (offer.provider_id == '9') {
+		supported = true;
+		if (watch_url_init){
+                var watch_url = watch_url_init;
+		}
+              }
+              else if (offer.provider_id == '37') {
+		supported = true;
+		if (watch_url_init){
+                var watch_url = watch_url_init.replace("showtime","showtimeanytime").replace('#\/movie','#play');
+		}
+	      }
+              if (supported) {
+		if (watch_url_mobile){
+			watch_url = watch_url_mobile;
+		}
+	        window.open(watch_url,"_self");
+	      }
+            }
     }
+  });
   }
 
   app.updateMovieCard = function(item) {
@@ -324,41 +349,59 @@ app.playRandomMovie = function() {
           var response = JSON.parse(request.response);
           var data = response;
           
-          for (var i = 0; i < data.offers.length; i++) {
-            var offer = data.offers[i];
+    var presentation_type = ["hd","sd"];
+  presentation_type.forEach(function(quality){
+    for (var i = 0; i < data.offers.length; i++) {
+      var offer = data.offers[i];
 
-            if (offer.monetization_type == 'flatrate' && offer.presentation_type == 'hd') {
-              var watch_url_init = offer.urls.standard_web;
-              //console.log(watch_url_init + ' ' +offer.provider_id);
+            if (offer.monetization_type == 'flatrate' && offer.presentation_type == quality) {
+	      var current_os = "unknown";//app.getMobileOperatingSystem();
+	      var supported = false;
+	      var watch_url_mobile = false;
+              if (current_os == 'Android' && offer.urls.deeplink_android) {
+                watch_url_mobile = offer.urls.deeplink_android;
+	      }
+	      else if (current_os == 'iOS' && offer.urls.deeplink_ios) {
+                watch_url_mobile = offer.urls.deeplink_ios;
+	      }
+	      else {
+                var watch_url_init = offer.urls.standard_web;
+	      }
               //should be using provider id
               if (offer.provider_id == '8') {
+		supported = true;
+		if (watch_url_init){
                 var watch_url = watch_url_init.replace("title","watch");
-                //console.log(watch_url);
-                window.open(watch_url,"_self");
-                break;
+		}
               }
               else if (offer.provider_id == '31') {
+		supported = true;
+		if (watch_url_init){
                 var watch_url = watch_url_init + '?autoplay=true';
-                //console.log(watch_url);
-                window.open(watch_url,"_self");
-                break;
+		}
               }
               else if (offer.provider_id == '9') {
-                var watch_url = watch_url_init.substring(0, watch_url_init.indexOf('?')) + '/ref=atv_dp_pb_core?autoplay=1&t=3';
-                //console.log(watch_url);
-                window.open(watch_url,"_self");
-                break;
+		supported = true;
+		if (watch_url_init){
+                var watch_url = watch_url_init;
+		}
               }
               else if (offer.provider_id == '37') {
+		supported = true;
+		if (watch_url_init){
                 var watch_url = watch_url_init.replace("showtime","showtimeanytime").replace('#\/movie','#play');
-                //console.log(watch_url);
-                window.open(watch_url,"_self");
-                break;
-              }
+		}
+	      }
+              if (supported) {
+		if (watch_url_mobile){
+			watch_url = watch_url_mobile;
+		}
+	        window.open(watch_url,"_self");
+	      }
             }
-          }
-
-
+    }
+  });
+  
         }
       } else {
         //nothing for now
