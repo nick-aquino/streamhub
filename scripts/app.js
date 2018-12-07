@@ -7,6 +7,8 @@
     visibleCards: new Map(),
     selectedCards: new Map(),
     selectedServices: new Set(),
+    genres: new Set(),
+    selectedGenres: new Set(),
     spinner: document.querySelector('.loaderContainer'),
     scroller: document.querySelector('.scrollLoad'),
     cardTemplate: document.querySelector('.cardTemplate'),
@@ -37,7 +39,7 @@
     app.selectedServices.forEach(function(service) {
       providers += '%22'+ service + '%22,';
     });
-    var url_str = 'https://apis.justwatch.com/content/titles/en_US/popular?body=%7B%22age_certifications%22:null,%22content_types%22:%5B%22movie%22%5D,%22genres%22:null,%22languages%22:null,%22max_price%22:null,%22min_price%22:null,%22monetization_types%22:%5B%22free%22,%22ads%22,%22flatrate%22%5D,%22page%22:{page_number},%22page_size%22:100,%22presentation_types%22:null,%22providers%22:%5B'+providers.substring(0, providers.length - 1)+'%5D,%22release_year_from%22:null,%22release_year_until%22:null,%22scoring_filter_types%22:null,%22timeline_type%22:null%7D';
+    var url_str = 'http://knickj.com:5000/content/titles/en_US/popular?body=%7B%22age_certifications%22:null,%22content_types%22:%5B%22movie%22%5D,%22genres%22:null,%22languages%22:null,%22max_price%22:null,%22min_price%22:null,%22monetization_types%22:%5B%22free%22,%22ads%22,%22flatrate%22%5D,%22page%22:{page_number},%22page_size%22:100,%22presentation_types%22:null,%22providers%22:%5B'+providers.substring(0, providers.length - 1)+'%5D,%22release_year_from%22:null,%22release_year_until%22:null,%22scoring_filter_types%22:null,%22timeline_type%22:null%7D';
     var url = url_str.replace("{page_number}",page_number);
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
@@ -52,7 +54,7 @@
         //console.log(request.readyState);
       }
     };
-    request.open('GET', cors+url);
+    request.open('GET', url);
     request.send();
   };
 
@@ -72,7 +74,7 @@
   };
 
   app.getStreamLink = function(id) {
-    var url = 'https://apis.justwatch.com/content/titles/movie/{id}/locale/en_US';
+    var url = 'http://knickj.com:5000/content/titles/movie/{id}/locale/en_US';
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
       if (request.readyState === XMLHttpRequest.DONE) {
@@ -85,7 +87,7 @@
         //nothing for now
       }
     };
-    request.open('GET', cors+url.replace("{id}",id));
+    request.open('GET', url.replace("{id}",id));
     request.send();
   }
 
@@ -319,7 +321,7 @@ app.playRandomMovie = function() {
     app.selectedServices.forEach(function(service) {
       providers += '%22'+ service + '%22,';
     });
-    var url = 'https://apis.justwatch.com/content/titles/en_US/popular?body=%7B%22age_certifications%22:null,%22content_types%22:%5B%22movie%22%5D,%22genres%22:null,%22languages%22:null,%22max_price%22:null,%22min_price%22:null,%22monetization_types%22:%5B%22free%22,%22ads%22,%22flatrate%22%5D,%22page%22:1,%22page_size%22:999999,%22presentation_types%22:null,%22providers%22:%5B'+providers.substring(0, providers.length - 1)+'%5D,%22release_year_from%22:null,%22release_year_until%22:null,%22scoring_filter_types%22:null,%22timeline_type%22:null%7D';
+    var url = 'http://knickj.com:5000/content/titles/en_US/popular?body=%7B%22age_certifications%22:null,%22content_types%22:%5B%22movie%22%5D,%22genres%22:null,%22languages%22:null,%22max_price%22:null,%22min_price%22:null,%22monetization_types%22:%5B%22free%22,%22ads%22,%22flatrate%22%5D,%22page%22:1,%22page_size%22:999999,%22presentation_types%22:null,%22providers%22:%5B'+providers.substring(0, providers.length - 1)+'%5D,%22release_year_from%22:null,%22release_year_until%22:null,%22scoring_filter_types%22:null,%22timeline_type%22:null%7D';
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
       if (request.readyState === XMLHttpRequest.DONE) {
@@ -335,13 +337,13 @@ app.playRandomMovie = function() {
         //console.log(request.readyState);
       }
     };
-    request.open('GET', cors+url);
+    request.open('GET', url);
     request.send();
   }
 };
 
   app.playRandomLink = function(id) {
-    var url = 'https://apis.justwatch.com/content/titles/movie/{id}/locale/en_US';
+    var url = 'http://knickj.com:5000/content/titles/movie/{id}/locale/en_US';
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
       if (request.readyState === XMLHttpRequest.DONE) {
@@ -407,7 +409,7 @@ app.playRandomMovie = function() {
         //nothing for now
       }
     };
-    request.open('GET', cors+url.replace("{id}",id));
+    request.open('GET', url.replace("{id}",id));
     request.send();
   }
 
@@ -417,6 +419,32 @@ app.playRandomMovie = function() {
     poster: '/poster/44121984/{profile}'
   };
 
+  app.getGenres = function() {
+    
+    var genreSelector = document.querySelector('.genreSelectContainer .selectBox')
+    genreSelector.addEventListener('click', function() {
+      showCheckboxes();
+    });
+
+    //console.log(page_number);
+    var url = "http://knickj.com:5000/content/genres/locale/en_US";
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+      if (request.readyState === XMLHttpRequest.DONE) {
+        if (request.status === 200) {
+          var response = JSON.parse(request.response);
+          app.genres = new Set(response);
+		//console.log(app.genres);
+        }
+      } else {
+        //console.log(request.readyState);
+      }
+    };
+    request.open('GET', url);
+    request.send();
+  };
+
+  app.getGenres();
   app.getMovies();
 
 })();
