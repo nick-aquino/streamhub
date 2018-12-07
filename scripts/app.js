@@ -421,12 +421,6 @@ app.playRandomMovie = function() {
 
   app.getGenres = function() {
     
-    var genreSelector = document.querySelector('.genreSelectContainer .selectBox')
-    genreSelector.addEventListener('click', function() {
-      showCheckboxes();
-    });
-
-    //console.log(page_number);
     var url = "http://knickj.com:5000/content/genres/locale/en_US";
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
